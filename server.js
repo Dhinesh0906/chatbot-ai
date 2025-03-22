@@ -4,11 +4,10 @@ const bodyParser = require("body-parser");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Replace with your actual API key
 const API_KEY = "AIzaSyCztcJvS7Ji8eiWANrSFURai6WvFA5FI6o";
-
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 app.use(cors());
@@ -17,6 +16,7 @@ app.use(bodyParser.json());
 // Start chat session with Gemini 1.5 Pro
 const chat = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }).startChat();
 
+// POST route for chatbot interaction
 app.post("/chat", async (req, res) => {
     try {
         const userMessage = req.body.message;
@@ -33,6 +33,11 @@ app.post("/chat", async (req, res) => {
         console.error("Error processing request:", error);
         res.status(500).json({ error: "Internal server error" });
     }
+});
+
+// Default route to check if the server is running
+app.get("/", (req, res) => {
+    res.send("Chatbot API is live! Use POST /chat to communicate.");
 });
 
 app.listen(port, () => {
